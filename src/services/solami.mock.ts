@@ -1,15 +1,33 @@
 import type { DexName, PoolEvent, SlotTick } from './solami.types'
 
-const DEXES: DexName[] = ['Raydium', 'Meteora', 'Orca']
-
-const SYMBOLS = [
-    'BONK', 'WIF', 'JUP', 'PYTH', 'JTO',
-    'MEW', 'POPCAT', 'SLERF', 'MYRO', 'BOME',
-    'WEN', 'SAMO', 'TREMP', 'MICHI', 'GME',
+const DEXES: DexName[] = [
+    'raydium',
+    'raydium_clmm',
+    'orca_whirlpool',
+    'meteora_dlmm',
+    'meteora_pools',
+    'pumpswap',
 ]
 
-const BASE58 =
-    '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
+const SYMBOLS = [
+    'BONK',
+    'WIF',
+    'JUP',
+    'PYTH',
+    'JTO',
+    'MEW',
+    'POPCAT',
+    'SLERF',
+    'MYRO',
+    'BOME',
+    'WEN',
+    'SAMO',
+    'TREMP',
+    'MICHI',
+    'GME',
+]
+
+const BASE58 = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
 
 // ---------- helpers ----------
 
@@ -41,7 +59,8 @@ const MAX_LIVE_POOLS = 12
  */
 export function mockPoolEvent(): PoolEvent {
     const shouldCreate =
-        livePools.size < 4 || (livePools.size < MAX_LIVE_POOLS && Math.random() < 0.35)
+        livePools.size < 4 ||
+        (livePools.size < MAX_LIVE_POOLS && Math.random() < 0.35)
 
     if (shouldCreate) {
         return createMockPool()
@@ -66,6 +85,7 @@ function createMockPool(): PoolEvent {
         liquidityDeltaPct: 0,
         timestamp: Date.now(),
         alertLevel: 'stable',
+        kind: 'create',
     }
 
     livePools.set(evt.id, evt)
@@ -96,6 +116,7 @@ function driftMockPool(): PoolEvent {
         liquidityDeltaPct: deltaPct,
         timestamp: Date.now(),
         alertLevel,
+        kind: driftPct > 0 ? 'add' : 'remove',
     }
 
     livePools.set(pool.id, updated)

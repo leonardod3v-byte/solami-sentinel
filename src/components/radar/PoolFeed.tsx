@@ -1,5 +1,3 @@
-// src/components/radar/PoolFeed.tsx
-
 import { formatDistanceToNow } from 'date-fns'
 import { useSentinelStore } from '../../store/sentinel.store'
 import { useNow } from '../../hooks/useNow'
@@ -27,14 +25,28 @@ function fmtUsd(n: number): string {
 function PoolRow({ evt }: { evt: PoolEvent }) {
     const deltaPositive = evt.liquidityDeltaPct >= 0
     const deltaLabel = `${deltaPositive ? '+' : ''}${evt.liquidityDeltaPct.toFixed(1)}%`
+    const isNewMint = evt.kind === 'create' && evt.currentLiquidityUsd === 0
+    const isNewPool = evt.kind === 'create' && evt.currentLiquidityUsd > 0
 
     return (
         <li
             className={`border-l-2 ${ALERT_BORDER[evt.alertLevel]} px-4 py-2 font-mono text-xs transition-colors hover:bg-white/5`}
         >
             <div className="flex items-center justify-between gap-2">
-                <span className="truncate font-semibold text-text-primary">
-                    {evt.tokenSymbol}
+                <span className="flex items-center gap-2 truncate">
+                    <span className="truncate font-semibold text-text-primary">
+                        {evt.tokenSymbol}
+                    </span>
+                    {isNewMint && (
+                        <span className="shrink-0 rounded border border-neon-cyan px-1 py-0.5 text-[8px] uppercase tracking-wider text-neon-cyan">
+                            mint
+                        </span>
+                    )}
+                    {isNewPool && (
+                        <span className="shrink-0 rounded border border-neon-green px-1 py-0.5 text-[8px] uppercase tracking-wider text-neon-green">
+                            pool
+                        </span>
+                    )}
                 </span>
                 <span className="shrink-0 text-[10px] uppercase tracking-wider text-text-dim">
                     {evt.dex}
@@ -43,19 +55,27 @@ function PoolRow({ evt }: { evt: PoolEvent }) {
 
             <div className="mt-1 flex items-center justify-between gap-2">
                 <span className="text-text-dim">
-                    liq:{' '}
-                    <span className="text-text-primary">
-                        {fmtUsd(evt.currentLiquidityUsd)}
-                    </span>{' '}
-                    <span
-                        className={
-                            deltaPositive
-                                ? 'text-neon-green'
-                                : 'text-neon-red'
-                        }
-                    >
-                        ({deltaLabel})
-                    </span>
+                    {isNewMint ? (
+                        <span className="text-neon-cyan">
+                            new token launched
+                        </span>
+                    ) : (
+                        <>
+                            liq:{' '}
+                            <span className="text-text-primary">
+                                {fmtUsd(evt.currentLiquidityUsd)}
+                            </span>{' '}
+                            <span
+                                className={
+                                    deltaPositive
+                                        ? 'text-neon-green'
+                                        : 'text-neon-red'
+                                }
+                            >
+                                ({deltaLabel})
+                            </span>
+                        </>
+                    )}
                 </span>
 
                 <span className="shrink-0 text-[10px] text-text-dim">
